@@ -96,8 +96,8 @@ const Parser = {
         return Parser.create(
             function (input) {
                 const { success, failure, error } = parser(input);
-                if (success) return success;
-                if (failure) return failure;
+                if (success) return { success };
+                if (failure) return { failure };
                 return { failure: error };
             }
         );
