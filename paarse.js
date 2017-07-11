@@ -1,7 +1,7 @@
 /**
- * A parser is a function that takes a single argument as input and returns a
- * parse result as an output. A parse result has exactly one of the following
- * properties: "success", "failure", "error".
+ * A parser is an object with a `parse` method that takes a single argument as
+ * input and returns a parse result as an output. A parse result has exactly
+ * one of the following properties: "success", "failure", "error".
  *
  *  * If the result has the "success" property, the parse was successful and
  *      the value is the pair of the result of the parse and the remainder of
@@ -21,113 +21,104 @@
 
 
 /**
- * Partial function application.
- */
-Function.prototype.partial = function (...args1) {
-    return (...args2) => this(...args1, ...args2);
-};
-
-
-/**
  * Basic Parser combinators and factories.
  */
-const Parser = {
+class Parser {
     /**
-     * Create a parser by attaching unary parser combinators as methods to the
-     * supplied parser.
+     * Create a new parser.
      */
-    create(parser) {
-        parser.try = Parser.try.partial(parser);
-        parser.bind = Parser.bind.partial(parser);
-        return parser;
-    },
+    constructor(parse) {
+        this.parse = parse;
+    }
 
     /**
      * A primitive parser that always succeeds.
      */
-    constantSuccess(result, next) {
-        return Parser.create(
+    static constantSuccess(result, next) {
+        return new Parser(
             function (input) {
                 return { success: [result, next(input)] };
             }
         );
-    },
+    }
 
     /**
      * A primitive parser that always fails.
      */
-    constantFailure(failure) {
-        return Parser.create(
+    static constantFailure(failure) {
+        return new Parser(
             function (input) {
                 return { failure };
             }
         );
-    },
+    }
 
     /**
      * A primitive parser that always errors.
      */
-    constantError(error) {
-        return Parser.create(
+    static constantError(error) {
+        return new Parser(
             function (input) {
                 return { error };
             }
         );
-    },
+    }
 
     /**
      * A basic parser that attempts to match the input, or fails if no match is
      * found.
      */
-    predicate(match) {
-        return Parser.create(
+    static predicate(match) {
+        return new Parser(
             function (input) {
                 const success = match(input);
                 if (success) return { success };
                 return { failure: true };
             }
         );
-    },
+    }
 
     /**
      * A combinator that converts errors to failures.
      */
-    try(parser) {
-        return Parser.create(
+    try() {
+        const parser = this;
+        return new Parser(
             function (input) {
-                const { success, failure, error } = parser(input);
+                const { success, failure, error } = parser.parse(input);
                 if (success) return { success };
                 if (failure) return { failure };
                 return { failure: error };
             }
         );
-    },
+    }
 
     /**
      * A combinator that transforms successes, failures and errors.
      */
-    bind(parser, onSuccess, onFailure = f => f, onError = e => e) {
-        return Parser.create(
+    bind(onSuccess, onFailure = f => f, onError = e => e) {
+        const parser = this;
+        return new Parser(
             function (input) {
-                const { success, failure, error } = parser(input);
+                const { success, failure, error } = parser.parse(input);
                 if (failure) return { failure: onFailure(failure) };
                 if (error) return { error: onError(error) };
                 const [result, next] = success;
                 return { success: [onSuccess(result), next] };
             }
         );
-    },
+    }
 
     /**
      * A combinator that creates a new parser that matches the first of its
      * component parsers that matches the input. If no match is found, it
      * fails since no input was consumed.
      */
-    choice(...parsers) {
-        return Parser.create(
+    static choice(...parsers) {
+        return new Parser(
             function (input) {
                 for (const parser of parsers) {
-                    const { success, failure, error } = parser(input);
+                    const { success, failure, error } = parser.parse(input);
                     if (error) return { error };
                     if (success) return { success };
                     // continue on failure
@@ -136,7 +127,7 @@ const Parser = {
                 return { failure: true };
             }
         );
-    },
+    }
 
     /**
      * A combinator that creates a new parser which produces an array of the
@@ -144,12 +135,12 @@ const Parser = {
      * first component parser fails, it fails since no input was consumed. If
      * any other parser fails, or if any parser errors, it errors.
      */
-    sequence(...parsers) {
-        return Parser.create(
+    static sequence(...parsers) {
+        return new Parser(
             function (input) {
                 const results = [];
                 for (const parser of parsers) {
-                    const { success, failure, error } = parser(input);
+                    const { success, failure, error } = parser.parse(input);
                     if (error) return { error };
                     if (failure) return results.length > 0
                         ? { error: true }

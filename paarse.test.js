@@ -2,7 +2,7 @@ test(
     '`constantSuccess` results in success',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -14,7 +14,7 @@ test(
     '`constantSuccess` gives correct result',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success',
             result.success[0]
@@ -26,7 +26,7 @@ test(
     '`constantSuccess` gives correct remaining input',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1]
@@ -39,7 +39,7 @@ test(
     '`constantFailure` results in failure',
     () => {
         const parser = Parser.constantFailure('failure');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -51,7 +51,7 @@ test(
     '`constantFailure` gives correct result',
     () => {
         const parser = Parser.constantFailure('failure');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'failure',
             result.failure
@@ -64,7 +64,7 @@ test(
     '`constantError` results in error',
     () => {
         const parser = Parser.constantError('error');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -76,7 +76,7 @@ test(
     '`constantError` gives correct result',
     () => {
         const parser = Parser.constantError('error');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'error',
             result.error
@@ -93,7 +93,7 @@ test(
                 ? ['expected', 'next']
                 : undefined
         );
-        const result = parser('expected');
+        const result = parser.parse('expected');
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -109,7 +109,7 @@ test(
                 ? ['expected', 'next']
                 : undefined
         );
-        const result = parser('expected');
+        const result = parser.parse('expected');
         assertEqual(
             'expected',
             result.success[0]
@@ -125,7 +125,7 @@ test(
                 ? ['expected', 'next']
                 : undefined
         );
-        const result = parser('expected');
+        const result = parser.parse('expected');
         assertEqual(
             'next',
             result.success[1]
@@ -141,7 +141,7 @@ test(
                 ? ['expected', 'next']
                 : undefined
         );
-        const result = parser('unexpected');
+        const result = parser.parse('unexpected');
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -154,7 +154,7 @@ test(
     '`try` succeeds on underlying success',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -166,7 +166,7 @@ test(
     '`try` gives correct result on underlying success',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success',
             result.success[0],
@@ -178,7 +178,7 @@ test(
     '`try` gives correct remaining input on underlying success',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1],
@@ -190,7 +190,7 @@ test(
     '`try` fails on underlying failure',
     () => {
         const parser = Parser.constantFailure('failure').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -202,7 +202,7 @@ test(
     '`try` gives correct result on underlying failure',
     () => {
         const parser = Parser.constantFailure('failure').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'failure',
             result.failure
@@ -214,7 +214,7 @@ test(
     '`try` fails on underlying error',
     () => {
         const parser = Parser.constantError('error').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -226,7 +226,7 @@ test(
     '`try` gives correct result on underlying error',
     () => {
         const parser = Parser.constantError('error').try();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'error',
             result.failure
@@ -240,7 +240,7 @@ test(
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -253,7 +253,7 @@ test(
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success2',
             result.success[0],
@@ -266,7 +266,7 @@ test(
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1],
@@ -279,7 +279,7 @@ test(
     () => {
         const parser = Parser.constantFailure('failure')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -292,7 +292,7 @@ test(
     () => {
         const parser = Parser.constantFailure('failure')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'failure2',
             result.failure
@@ -305,7 +305,7 @@ test(
     () => {
         const parser = Parser.constantError('error')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -318,7 +318,7 @@ test(
     () => {
         const parser = Parser.constantError('error')
             .bind(_ => 'success2', _ => 'failure2', _ => 'error2');
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'error2',
             result.error
@@ -331,7 +331,7 @@ test(
     '`choice` results in failure with no components',
     () => {
         const parser = Parser.choice();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -345,7 +345,7 @@ test(
         const parser = Parser.choice(
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -359,7 +359,7 @@ test(
         const parser = Parser.choice(
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             'success',
             result.success[0]
@@ -373,7 +373,7 @@ test(
         const parser = Parser.choice(
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             'next',
             result.success[1]
@@ -385,7 +385,7 @@ test(
     '`choice` results in failure with failure component',
     () => {
         const parser = Parser.choice(Parser.constantFailure('failure'));
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -397,7 +397,7 @@ test(
     '`choice` results in error with error component',
     () => {
         const parser = Parser.choice(Parser.constantError('error'));
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -412,7 +412,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantSuccess('success2', _ => 'next2')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -427,7 +427,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantSuccess('success2', _ => 'next2')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success',
             result.success[0]
@@ -442,7 +442,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantSuccess('success2', _ => 'next2')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1]
@@ -457,7 +457,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantFailure('failure')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -472,7 +472,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantFailure('failure')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success',
             result.success[0]
@@ -487,7 +487,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantFailure('failure')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1]
@@ -502,7 +502,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantError('error')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -517,7 +517,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantError('error')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success',
             result.success[0]
@@ -532,7 +532,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantError('error')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1]
@@ -547,7 +547,7 @@ test(
             Parser.constantFailure('failure'),
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -562,7 +562,7 @@ test(
             Parser.constantFailure('failure'),
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'success',
             result.success[0]
@@ -577,7 +577,7 @@ test(
             Parser.constantFailure('failure'),
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next',
             result.success[1]
@@ -592,7 +592,7 @@ test(
             Parser.constantFailure('failure'),
             Parser.constantError('error')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -607,7 +607,7 @@ test(
             Parser.constantError('error'),
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -620,7 +620,7 @@ test(
     '`sequence` results in success with no components',
     () => {
         const parser = Parser.sequence();
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -634,7 +634,7 @@ test(
         const parser = Parser.sequence(
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -648,7 +648,7 @@ test(
         const parser = Parser.sequence(
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             'success',
             result.success[0]
@@ -662,7 +662,7 @@ test(
         const parser = Parser.sequence(
             Parser.constantSuccess('success', _ => 'next')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             'next',
             result.success[1]
@@ -674,7 +674,7 @@ test(
     '`sequence` results in failure with failure component',
     () => {
         const parser = Parser.sequence(Parser.constantFailure('failure'));
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('failure'),
             'Result is not failure'
@@ -686,7 +686,7 @@ test(
     '`sequence` results in error with error component',
     () => {
         const parser = Parser.sequence(Parser.constantError('error'));
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -701,7 +701,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantSuccess('success2', _ => 'next2')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('success'),
             'Result is not success'
@@ -716,7 +716,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantSuccess('success2', _ => 'next2')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             ['success', 'success2'],
             result.success[0]
@@ -731,7 +731,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantSuccess('success2', _ => 'next2')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertEqual(
             'next2',
             result.success[1]
@@ -746,7 +746,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantFailure('failure')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
@@ -761,7 +761,7 @@ test(
             Parser.constantSuccess('success', _ => 'next'),
             Parser.constantError('error')
         );
-        const result = parser(undefined);
+        const result = parser.parse(undefined);
         assertTrue(
             result.hasOwnProperty('error'),
             'Result is not error'
