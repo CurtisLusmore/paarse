@@ -28,6 +28,14 @@ function assertEqual(expected, actual) {
             assertEqual(expected[index], actual[index]);
         }
     }
+    else if (typeof expected == 'object' && typeof actual == 'object') {
+        for (const key in expected) {
+            assertEqual(expected[key], actual[key]);
+        }
+        for (const key in actual) {
+            assertEqual(expected[key], actual[key]);
+        }
+    }
     else {
         if (actual !== expected) throw error;
     }
@@ -66,26 +74,49 @@ function runTests() {
  * into the supplied DOM element.
  */
 function displayResults(parent) {
+    function createRow(...elements) {
+        const row = document.createElement('tr');
+        elements.forEach(element => row.appendChild(createCell(element)));
+        return row;
+    }
+
     function createCell(content) {
         const cell = document.createElement('td');
         if (content !== undefined) cell.innerText = content;
         return cell;
     }
+
     const results = runTests();
     const table = document.createElement('table');
-    const header = document.createElement('tr');
-    header.appendChild(createCell('Test name'));
-    header.appendChild(createCell('Passed'));
-    header.appendChild(createCell('Error message'));
+
+    const header = createRow(
+        'Test name',
+        'Passed',
+        'Error message'
+    );
     table.appendChild(header);
 
+    const summary = createRow(
+        'Total tests',
+        '0/0',
+        ''
+    );
+    table.appendChild(summary);
+
+    let passedTests = 0;
+    let totalTests = 0;
     for (const { description, passed, error } of results) {
-        const row = document.createElement('tr');
-        row.appendChild(createCell(description));
-        row.appendChild(createCell(passed));
-        row.appendChild(createCell(error));
+        const row = createRow(
+            description,
+            passed,
+            error
+        );
         table.appendChild(row);
+        if (passed) passedTests++;
+        totalTests++;
     }
+
+    summary.childNodes[1].innerText = `${passedTests}/${totalTests}`
 
     parent.appendChild(table);
 }
