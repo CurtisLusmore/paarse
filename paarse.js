@@ -28,6 +28,7 @@ class Parser {
      * Create a new parser.
      */
     constructor(parse) {
+        if (parse instanceof Parser) parse = parse.parse;
         this.parse = parse;
     }
 
@@ -35,7 +36,7 @@ class Parser {
      * A primitive parser that always succeeds.
      */
     static constantSuccess(result, next) {
-        return new Parser(
+        return new this(
             function (input) {
                 return { success: [result, next(input)] };
             }
@@ -46,7 +47,7 @@ class Parser {
      * A primitive parser that always fails.
      */
     static constantFailure(failure) {
-        return new Parser(
+        return new this(
             function (input) {
                 return { failure };
             }
@@ -57,7 +58,7 @@ class Parser {
      * A primitive parser that always errors.
      */
     static constantError(error) {
-        return new Parser(
+        return new this(
             function (input) {
                 return { error };
             }
@@ -69,7 +70,7 @@ class Parser {
      * found.
      */
     static predicate(match) {
-        return new Parser(
+        return new this(
             function (input) {
                 const success = match(input);
                 if (success) return { success };
@@ -83,7 +84,7 @@ class Parser {
      */
     try() {
         const parser = this;
-        return new Parser(
+        return new this.constructor(
             function (input) {
                 const { success, failure, error } = parser.parse(input);
                 if (success) return { success };
@@ -98,7 +99,7 @@ class Parser {
      */
     bind(onSuccess, onFailure = f => f, onError = e => e) {
         const parser = this;
-        return new Parser(
+        return new this.constructor(
             function (input) {
                 const { success, failure, error } = parser.parse(input);
                 if (failure) return { failure: onFailure(failure) };
@@ -115,7 +116,7 @@ class Parser {
      * fails since no input was consumed.
      */
     static choice(...parsers) {
-        return new Parser(
+        return new this(
             function (input) {
                 for (const parser of parsers) {
                     const { success, failure, error } = parser.parse(input);
@@ -136,7 +137,7 @@ class Parser {
      * any other parser fails, or if any parser errors, it errors.
      */
     static sequence(...parsers) {
-        return new Parser(
+        return new this(
             function (input) {
                 const results = [];
                 for (const parser of parsers) {
@@ -152,5 +153,63 @@ class Parser {
                 return { success: [results, input] };
             }
         );
+    }
+};
+
+
+/**
+ * String-specific Parser combinators and factories.
+ */
+class StringParser extends Parser {
+    /**
+     * Create a new string parser.
+     */
+    constructor(parse) {
+        super(parse);
+    }
+
+    /**
+     * A primitive parser that matches the end of input.
+     */
+    static get eos() {
+        return StringParser.predicate(
+            function ({ input, position }) {
+                return input.length === position
+                    ? [undefined, { input, position }]
+                    : undefined;
+            }
+        );
+    }
+
+    /**
+     * A combinator that also checks for end of input.
+     */
+    finalize() {
+        const parser = this;
+        return StringParser
+            .sequence(parser, StringParser.eos)
+            .bind(([result,]) => result);
+    }
+
+    /**
+     * A basic parser that matches a single character.
+     */
+    static character(char) {
+        return StringParser.predicate(
+            function ({ input, position }) {
+                return input[position] === char
+                    ? [input[position], { input, position: position + 1 }]
+                    : undefined;
+            }
+        );
+    }
+
+    /**
+     * A basic parser that matches a string.
+     */
+    static string(string) {
+        return StringParser
+            .sequence(...string.split('').map(StringParser.character))
+            .bind(cs => cs.join(''));
     }
 };
