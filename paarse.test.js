@@ -236,6 +236,311 @@ test(
 
 
 test(
+    '`many(0)` succeeds on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(0);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertTrue(
+            result.hasOwnProperty('success'),
+            'Result is not success'
+        );
+    }
+);
+
+test(
+    '`many(0)` gives correct result on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(0);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertEqual(
+            ['1', '1', '1'],
+            result.success[0]
+        );
+    }
+);
+
+test(
+    '`many(0)` gives correct remaining input on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(0);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertEqual(
+            ['0'],
+            result.success[1]
+        );
+    }
+);
+
+test(
+    '`many(0)` succeeds on incorrect input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(0);
+        const result = parser.parse(['0']);
+        assertTrue(
+            result.hasOwnProperty('success'),
+            'Result is not success'
+        );
+    }
+);
+
+test(
+    '`many(0)` gives correct result on incorrect input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(0);
+        const result = parser.parse(['0']);
+        assertEqual(
+            [],
+            result.success[0]
+        );
+    }
+);
+
+test(
+    '`many(0)` gives correct remaining input on incorrect input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(0);
+        const result = parser.parse(['0']);
+        assertEqual(
+            ['0'],
+            result.success[1]
+        );
+    }
+);
+
+test(
+    '`many(k)` succeeds on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertTrue(
+            result.hasOwnProperty('success'),
+            'Result is not success'
+        );
+    }
+);
+
+test(
+    '`many(k)` gives correct result on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertEqual(
+            ['1', '1', '1'],
+            result.success[0]
+        );
+    }
+);
+
+test(
+    '`many(k)` gives correct remaining input on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertEqual(
+            ['0'],
+            result.success[1]
+        );
+    }
+);
+
+test(
+    '`many(k)` fails on incorrect input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2);
+        const result = parser.parse(['0']);
+        assertTrue(
+            result.hasOwnProperty('failure'),
+            'Result is not failure'
+        );
+    }
+);
+
+test(
+    '`many(k)` errors on insufficient input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2);
+        const result = parser.parse(['1', '0']);
+        assertTrue(
+            result.hasOwnProperty('error'),
+            'Result is not error'
+        );
+    }
+);
+
+test(
+    '`many(j, k)` succeeds on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertTrue(
+            result.hasOwnProperty('success'),
+            'Result is not success'
+        );
+    }
+);
+
+test(
+    '`many(j, k)` gives correct result on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertEqual(
+            ['1', '1', '1'],
+            result.success[0]
+        );
+    }
+);
+
+test(
+    '`many(j, k)` gives correct remaining input on correct input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '1', '1', '0']);
+        assertEqual(
+            ['0'],
+            result.success[1]
+        );
+    }
+);
+
+test(
+    '`many(j, k)` fails on incorrect input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['0']);
+        assertTrue(
+            result.hasOwnProperty('failure'),
+            'Result is not failure'
+        );
+    }
+);
+
+test(
+    '`many(j, k)` errors on insufficient input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '0']);
+        assertTrue(
+            result.hasOwnProperty('error'),
+            'Result is not error'
+        );
+    }
+);
+
+test(
+    '`many(j, k)` succeeds on excessive input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '1', '1', '1', '0']);
+        assertTrue(
+            result.hasOwnProperty('success'),
+            'Result is not success'
+        );
+    }
+);
+
+test(
+    '`many(j, k)` gives correct result on excessive input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '1', '1', '1', '0']);
+        assertEqual(
+            ['1', '1', '1'],
+            result.success[0]
+        );
+    }
+);
+
+test(
+    '`many(j, k)` gives correct remaining input on excessive input',
+    () => {
+        const parser = Parser.predicate(
+            ([input, ...next]) => input === '1'
+                ? ['1', next]
+                : undefined
+        ).many(2, 3);
+        const result = parser.parse(['1', '1', '1', '1', '0']);
+        assertEqual(
+            ['1', '0'],
+            result.success[1]
+        );
+    }
+);
+
+
+test(
     '`bind` succeeds on underlying success',
     () => {
         const parser = Parser.constantSuccess('success', _ => 'next')

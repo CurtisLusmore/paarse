@@ -95,6 +95,34 @@ class Parser {
     }
 
     /**
+     * A combinator that repeats a parser until it fails.
+     */
+    many(minCount = 1, maxCount = Infinity) {
+        const parser = this;
+        return new this.constructor(
+            function (input) {
+                const results = [];
+                while (results.length < maxCount) {
+                    const { success, failure, error } = parser.parse(input);
+                    if (error) return { error };
+                    if (failure) break;
+                    const [result, next] = success;
+                    results.push(result);
+                    input = next;
+                }
+
+                if (minCount <= results.length) {
+                    return { success: [results, input] };
+                }
+
+                return results.length == 0
+                    ? { failure: true }
+                    : { error: true };
+            }
+        );
+    }
+
+    /**
      * A combinator that transforms successes, failures and errors.
      */
     bind(onSuccess, onFailure = f => f, onError = e => e) {
