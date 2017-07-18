@@ -42,6 +42,19 @@ function assertEqual(expected, actual) {
 }
 
 /**
+ * Assert that an error is thrown when running the supplied operation.
+ */
+function assertThrows(assertion, message) {
+    try {
+        assertion()
+    }
+    catch (error) {
+        return;
+    }
+    throw message || 'Assertion failed';
+}
+
+/**
  * Run a test and return the results.
  */
 function runTest({ description, run }) {

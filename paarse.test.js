@@ -1293,3 +1293,32 @@ test(
         );
     }
 );
+
+
+test(
+    '`run` gives correct result on complete string',
+    () => {
+        const parser = StringParser.character('a');
+        const result = parser.run('a');
+        assertEqual(
+            'a',
+            result
+        );
+    }
+);
+
+test(
+    '`run` results in error when not at end of string',
+    () => {
+        const parser = StringParser.character('a').finalize();
+        assertThrows(() => parser.run('ab'));
+    }
+);
+
+test(
+    '`run` results in error on failure',
+    () => {
+        const parser = StringParser.character('ab').finalize();
+        assertThrows(() => parser.run('ac'));
+    }
+);

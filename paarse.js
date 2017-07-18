@@ -95,6 +95,21 @@ class Parser {
     }
 
     /**
+     * A combinator that converts failures to errors.
+     */
+    errorOnFail() {
+        const parser = this;
+        return new this.constructor(
+            function (input) {
+                const { success, failure, error } = parser.parse(input);
+                if (success) return { success };
+                if (error) return { error };
+                return { error: failure };
+            }
+        );
+    }
+
+    /**
      * A combinator that repeats a parser until it fails.
      */
     many(minCount = 1, maxCount = Infinity) {
@@ -190,13 +205,6 @@ class Parser {
  */
 class StringParser extends Parser {
     /**
-     * Create a new string parser.
-     */
-    constructor(parse) {
-        super(parse);
-    }
-
-    /**
      * A primitive parser that matches the end of input.
      */
     static get eos() {
@@ -216,7 +224,23 @@ class StringParser extends Parser {
         const parser = this;
         return StringParser
             .sequence(parser, StringParser.eos)
+            .errorOnFail()
             .bind(([result,]) => result);
+    }
+
+    /**
+     * Run this parser against the supplied input.
+     */
+    run(input) {
+        // failure not possible
+        const { success, error } = this
+            .finalize()
+            .parse({ input, position: 0 });
+        if (error) throw error;
+
+        // guaranteed no remaining input
+        const [result] = success;
+        return result;
     }
 
     /**
